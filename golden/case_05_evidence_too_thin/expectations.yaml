@@ -1,0 +1,14 @@
+case_id: case_05_evidence_too_thin
+description: Junior candidate, senior role — almost every requirement should be a gap.
+requirements:
+  - text: "10+ years building distributed systems"
+    expected: GAP_REPORTED
+  - text: "Kubernetes at scale"
+    expected: GAP_REPORTED
+  - text: "Go or Rust expertise"
+    expected: GAP_REPORTED
+  - text: "Open-source maintenance"
+    expected: GAP_REPORTED
+  - text: "Conference speaking"
+    expected: GAP_REPORTED
+minimum_first_pass_grounding_rate: 0.0

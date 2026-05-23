@@ -1,0 +1,19 @@
+case_id: case_03_data_scientist_ml
+description: DS with forecasting + feature store evidence; no LLM background.
+requirements:
+  - text: "5+ years building production ML systems"
+    expected: SUPPORTED
+  - text: "Deep Python expertise"
+    expected: SUPPORTED
+  - text: "Experience with time-series forecasting"
+    expected: SUPPORTED
+  - text: "Feature-store experience"
+    expected: SUPPORTED
+  - text: "Spark for large-scale data prep"
+    expected: SUPPORTED
+  - text: "Team leadership"
+    expected: SUPPORTED
+  - text: "LLM / generative AI experience"
+    expected: GAP_REPORTED
+    gap_reason_must_mention: [llm, generative]
+minimum_first_pass_grounding_rate: 0.6

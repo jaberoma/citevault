@@ -1,0 +1,17 @@
+case_id: case_02_frontend_typescript
+description: Frontend candidate with TS + design system evidence; no backend.
+requirements:
+  - text: "Deep TypeScript experience"
+    expected: SUPPORTED
+  - text: "Experience leading design system work"
+    expected: SUPPORTED
+  - text: "React mastery"
+    expected: SUPPORTED
+  - text: "Public speaking / conference talks"
+    expected: SUPPORTED
+  - text: "Bundle-size optimization"
+    expected: SUPPORTED
+  - text: "Backend experience with Node.js"
+    expected: GAP_REPORTED
+    gap_reason_must_mention: [node]
+minimum_first_pass_grounding_rate: 0.6

@@ -1,0 +1,10 @@
+Staff Distributed Systems Engineer
+
+Required:
+- 10+ years building distributed systems
+- Kubernetes at scale
+- Go or Rust expertise
+
+Nice to have:
+- Open-source maintenance
+- Conference speaking

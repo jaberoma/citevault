@@ -1,0 +1,41 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama-data:/root/.ollama
+    ports:
+      - "11434:11434"
+
+  citevault-api:
+    build: ./citevault-api
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - CITEVAULT_MODEL=${CITEVAULT_MODEL:-gemma4:e4b}
+      - CITEVAULT_DB=/data/citevault.db
+    volumes:
+      - citevault-data:/data
+      - ./evidence:/evidence:ro
+      - ./out:/out
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  citevault-ui:
+    build: ./citevault-ui
+    depends_on:
+      citevault-api:
+        condition: service_started
+    ports:
+      - "5173:80"
+
+volumes:
+  ollama-data:
+    name: citevault-shared-ollama-data
+  citevault-data:

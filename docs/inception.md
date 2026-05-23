@@ -1,12 +1,14 @@
 # Citevault — Project Inception
 
 **Date:** 2026-05-11
+**Status:** Shaping complete. Design spec is the next artifact.
+**Purpose of this document:** Hand off the *outcome and rationale* of the shaping phase so a fresh session — possibly on a different machine, possibly with new agents — can pick up without re-litigating the decision.
 
 ---
 
 ## What we're building
 
-**Citevault** is a local-first AI résumé tailoring tool where every claim in the output is provably grounded in evidence the user has provided. If the model cannot ground a claim in a source, it refuses to write it and flags the gap honestly.
+**Citevault** is a local-first AI tool that produces tailored résumés and cover letters where **every claim is provably grounded in evidence the user has provided** (master résumé, project READMEs, blog posts, writing samples, performance reviews). If the model cannot ground a claim in a source, it refuses to write it and flags the gap honestly.
 
 *AI that won't lie about your experience.*
 

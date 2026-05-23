@@ -1,0 +1,12 @@
+Staff Frontend Engineer
+
+Required:
+- 7+ years frontend
+- Deep TypeScript experience
+- Experience leading design system work
+- React mastery
+
+Nice to have:
+- Public speaking / conference talks
+- Bundle-size optimization
+- Backend experience with Node.js
