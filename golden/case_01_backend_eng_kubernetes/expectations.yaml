@@ -1,0 +1,17 @@
+case_id: case_01_backend_eng_kubernetes
+description: Backend engineer with K8s and Go evidence; Rust is a deliberate gap.
+requirements:
+  - text: "5+ years building distributed systems"
+    expected: SUPPORTED
+  - text: "Strong experience with Kubernetes"
+    expected: SUPPORTED_AFTER_REWRITE
+  - text: "Familiarity with Go preferred"
+    expected: SUPPORTED
+  - text: "Mentorship experience valued"
+    expected: SUPPORTED
+  - text: "Caching at scale"
+    expected: SUPPORTED
+  - text: "Rust experience"
+    expected: GAP_REPORTED
+    gap_reason_must_mention: [rust]
+minimum_first_pass_grounding_rate: 0.6

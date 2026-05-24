@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+dist/
+build/
+
+# Node
+node_modules/
+.vite/
+
+# Data / runtime
+citevault.db
+citevault.db-shm
+citevault.db-wal
+*.log
+out/*
+!out/.gitkeep
+voice-samples/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+
+# Worktrees
+.claude/
+evidence/*
+!evidence/.gitkeep
+job.txt
+
+# Internal planning docs (never publish)
+.internal-docs/
+docs/superpowers/
+docs/blog-post-draft.md

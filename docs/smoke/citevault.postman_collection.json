@@ -1,0 +1,265 @@
+{
+  "info": {
+    "_postman_id": "citevault-api-smoke",
+    "name": "Citevault API Smoke Tests",
+    "description": "Automated smoke tests for the Citevault REST API.\n\nCovers: health, evidence upload/list/delete, settings CRUD.\nNot covered: SSE stream (Newman has no SSE support), tailoring/PDF (inference takes too long for automated runs), naive compare mode.\n\nRun from the repo root:\n  npx newman run docs/smoke/citevault.postman_collection.json \\\n    --working-dir . \\\n    --delay-request 500 \\\n    --timeout 30000\n\nPrerequisites: docker compose stack running on localhost:8000.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "source_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "original_model",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 Health Check",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"health is ok\", () => {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.status).to.equal(\"ok\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/health"
+      }
+    },
+    {
+      "name": "02 Upload Evidence",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 201\", () => pm.response.to.have.status(201));",
+              "pm.test(\"returns source id and kind\", () => {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.id).to.be.a(\"string\").and.not.empty;",
+              "    pm.expect(body.kind).to.be.a(\"string\").and.not.empty;",
+              "    pm.collectionVariables.set(\"source_id\", body.id);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "docs/smoke/fixtures/test_evidence.md"
+            }
+          ]
+        },
+        "url": "{{base_url}}/api/evidence/source"
+      }
+    },
+    {
+      "name": "03 List Evidence",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"uploaded source appears in list\", () => {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.sources).to.be.an(\"array\");",
+              "    const sourceId = pm.collectionVariables.get(\"source_id\");",
+              "    const found = body.sources.some(s => s.id === sourceId);",
+              "    pm.expect(found, `source ${sourceId} not found in list`).to.be.true;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/evidence"
+      }
+    },
+    {
+      "name": "04 Get Settings",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"has model field\", () => {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.model).to.be.a(\"string\").and.not.empty;",
+              "    pm.collectionVariables.set(\"original_model\", body.model);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/settings"
+      }
+    },
+    {
+      "name": "05 Update Settings",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"response reflects updated model\", () => {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.model).to.equal(pm.collectionVariables.get(\"original_model\"));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"model\": \"{{original_model}}\"}"
+        },
+        "url": "{{base_url}}/api/settings"
+      }
+    },
+    {
+      "name": "06 Verify Settings Persisted",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"model change persisted\", () => {",
+              "    pm.expect(pm.response.json().model).to.equal(pm.collectionVariables.get(\"original_model\"));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/settings"
+      }
+    },
+    {
+      "name": "07 Revert Settings",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"model reverted to original\", () => {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.model).to.equal(pm.collectionVariables.get(\"original_model\"));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"model\": \"{{original_model}}\"}"
+        },
+        "url": "{{base_url}}/api/settings"
+      }
+    },
+    {
+      "name": "08 Delete Evidence",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 204\", () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{base_url}}/api/evidence/source/{{source_id}}"
+      }
+    },
+    {
+      "name": "09 Verify Evidence Deleted",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"deleted source no longer in list\", () => {",
+              "    const body = pm.response.json();",
+              "    const sourceId = pm.collectionVariables.get(\"source_id\");",
+              "    const found = body.sources.some(s => s.id === sourceId);",
+              "    pm.expect(found, `source ${sourceId} should have been deleted`).to.be.false;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/evidence"
+      }
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+Senior ML Engineer — Forecasting
+
+Required:
+- 5+ years building production ML systems
+- Deep Python expertise
+- Experience with time-series forecasting
+- Feature-store experience (Feast/Tecton/similar)
+
+Nice to have:
+- Spark for large-scale data prep
+- Team leadership
+- LLM / generative AI experience

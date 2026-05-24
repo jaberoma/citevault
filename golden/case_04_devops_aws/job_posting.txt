@@ -1,0 +1,11 @@
+Platform Engineer
+
+Required:
+- 5+ years AWS at scale (EKS, RDS, networking)
+- Terraform / IaC experience
+- CI/CD platform ownership
+
+Nice to have:
+- FinOps / cloud cost optimization
+- Multi-region/DR experience
+- GCP or Azure exposure

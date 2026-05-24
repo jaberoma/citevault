@@ -1,0 +1,33 @@
+id,claim,evidence,true_verdict
+1,"Led K8s migration","Migrated 5 services from EC2 to EKS.",SUPPORTS
+2,"Built scalable systems","Worked on internal tools.",UNCLEAR
+3,"Wrote production Rust","Read 'The Rust Programming Language' last summer.",CONTRADICTS
+4,"Mentored junior engineers","Mentored 2 junior engineers through promotion.",SUPPORTS
+5,"Built Helm charts","Wrote one Helm chart for a side project.",PARTIAL
+6,"5+ years backend engineering","Backend engineer since 2018.",SUPPORTS
+7,"Deep Kubernetes expertise","Used kubectl a few times.",CONTRADICTS
+8,"Owned a design system","Owned the design system used by 15 teams.",SUPPORTS
+9,"Built ML models","Built demand-forecasting models in production.",SUPPORTS
+10,"Spoke at conferences","Gave 3 conference talks in 2024.",SUPPORTS
+11,"Reduced cloud spend 50%","Reduced cloud spend 22%.",PARTIAL
+12,"Production Rust experience","No mention of Rust in evidence.",CONTRADICTS
+13,"Distributed systems experience","Built a CRUD app in Django.",CONTRADICTS
+14,"Owned CI/CD","Owned the CI/CD platform on GitHub Actions.",SUPPORTS
+15,"Led 4-person team","Led the ML platform team (4 engineers).",SUPPORTS
+16,"Wrote Terraform modules","No mention of IaC in evidence.",UNCLEAR
+17,"PyTorch expertise","Built PyTorch forecasting model in production.",SUPPORTS
+18,"Spark experience","Used Spark for large-scale data prep.",SUPPORTS
+19,"Multi-cloud expertise","All AWS-only experience.",CONTRADICTS
+20,"FinOps expertise","Reduced cloud spend 22% via RI restructuring.",SUPPORTS
+21,"Wrote React Server Components","Conference talk on React Server Components.",PARTIAL
+22,"Built a feature store","Migrated feature store from raw S3 to Feast.",SUPPORTS
+23,"Maintained open-source projects","Built KuberDocs open-source.",SUPPORTS
+24,"Code reviews experience","No mention of reviewing in evidence.",UNCLEAR
+25,"GraphQL expertise","Built REST APIs in Node.js.",CONTRADICTS
+26,"Bundle size optimization","Reduced bundle size 35% via code-splitting.",SUPPORTS
+27,"Migrated to TypeScript","Migrated 200k-line codebase from JS to TS.",SUPPORTS
+28,"Wrote PHP plugins","Wrote a handful of PHP plugins.",SUPPORTS
+29,"10+ years experience","Engineer since 2024.",CONTRADICTS
+30,"Improved API latency","Reduced API latency 40% via caching redesign.",SUPPORTS
+31,"Mentorship coaching certification","Mentored 2 engineers through promotion.",PARTIAL
+32,"Built event-driven architecture","Built REST APIs.",CONTRADICTS

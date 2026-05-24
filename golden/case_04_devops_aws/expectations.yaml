@@ -1,0 +1,15 @@
+case_id: case_04_devops_aws
+description: AWS DevOps; multi-cloud is the deliberate gap.
+requirements:
+  - text: "5+ years AWS at scale"
+    expected: SUPPORTED
+  - text: "Terraform / IaC experience"
+    expected: SUPPORTED
+  - text: "CI/CD platform ownership"
+    expected: SUPPORTED
+  - text: "FinOps / cloud cost optimization"
+    expected: SUPPORTED
+  - text: "GCP or Azure exposure"
+    expected: GAP_REPORTED
+    gap_reason_must_mention: [gcp, azure]
+minimum_first_pass_grounding_rate: 0.7
