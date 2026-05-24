@@ -15,8 +15,9 @@ class FakeLLM:
     def complete(
         self, prompt: str, schema: dict[str, Any] | None = None,
         temperature: float = 0.2, system: str | None = None,
+        num_ctx: int | None = None,
     ) -> str:
-        self.calls.append({"prompt": prompt, "schema": schema, "temperature": temperature, "system": system})
+        self.calls.append({"prompt": prompt, "schema": schema, "temperature": temperature, "system": system, "num_ctx": num_ctx})
         if not self.responses:
             return "(no scripted response)"
         return self.responses.pop(0)
