@@ -157,3 +157,57 @@ Runs all golden cases through the full pipeline via `GoldenCaseRunner` (`applica
 cd citevault-api
 uv run citevault eval --golden ../golden
 ```
+
+---
+
+## Voice fine-tune pipeline (finetune/)
+
+Independent `uv` project — does not touch `citevault-api`.
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  Fine-tune pipeline  (one-shot CLI)                                     │
+│                                                                          │
+│  Step 1 — Dataset builder                                                │
+│    voice-samples/*.md   →  OllamaSyntheticPromptLLM                     │
+│                         →  list[TrainingPair(prompt, response)]          │
+│    filter: ≥ 100 words per sample                                        │
+│    Ollama model used: gemma4:e4b (generates the synthetic prompt)        │
+│                                                                          │
+│  Step 2 — LoRA trainer                                                   │
+│    base model: google/gemma-4-4b-it  (HuggingFace)                     │
+│    library: peft + transformers + accelerate                             │
+│    config: rank=16, alpha=32, target=q_proj+v_proj, epochs=2             │
+│    output: out/adapter/  (adapter_config.json + pytorch weights)         │
+│                                                                          │
+│  Step 3 — GGUF exporter                                                 │
+│    requires: LLAMA_CPP_DIR env var (llama.cpp cloned+built by user)     │
+│    shells out to: convert_lora_to_gguf.py                               │
+│    output: out/citevault-voice.gguf + out/Modelfile                     │
+│                                                                          │
+│  User registers model:                                                   │
+│    cd out && ollama create citevault-voice -f ./Modelfile               │
+│                                                                          │
+│  Citevault Settings → Model → pick "citevault-voice"                    │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Voice fine-tune quality gate (two axes)
+
+```
+┌─────────────────────────────────────────────────────┐
+│  Before adopting citevault-voice, verify both:      │
+│                                                     │
+│  Axis 1 — Voice fidelity                            │
+│    OllamaJudge (pairwise LLM-as-judge)              │
+│    Reference writing vs fine-tuned vs base          │
+│    Gate: win rate ≥ 65%                             │
+│                                                     │
+│  Axis 2 — Grounding regression                      │
+│    Re-run golden eval with citevault-voice          │
+│    Compare First-Pass Grounding Rate vs baseline    │
+│    Gate: regression ≤ 3 percentage points           │
+└─────────────────────────────────────────────────────┘
+```

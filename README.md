@@ -54,6 +54,26 @@ From the UI:
 See [docs/smoke/smoke-test.md](docs/smoke/smoke-test.md) for a full API + UI walkthrough.
 See [docs/evidence-format.md](docs/evidence-format.md) for how to structure your evidence files.
 
+## Voice fine-tuning (optional)
+
+Fine-tune Gemma 4 on your own writing samples to produce outputs that match your
+personal style.
+
+```bash
+cd finetune
+uv sync --extra dev
+uv run python -m citevault_finetune --voice ./voice-samples/ --out ./out
+
+# Register the fine-tuned model
+cd out && ollama create citevault-voice -f ./Modelfile
+```
+
+Then open **Settings → Model** and pick `citevault-voice`.
+
+See [docs/voice-finetune-guide.md](docs/voice-finetune-guide.md) for when to use it
+and [docs/smoke/voice-finetune-smoke-test.md](docs/smoke/voice-finetune-smoke-test.md)
+for a full walkthrough.
+
 ## Project structure
 
 ```
@@ -64,14 +84,17 @@ citevault-api/
     adapters/
       inbound/       # CLI (index/tailor/eval/serve) + FastAPI (REST + SSE)
       outbound/      # Ollama, SQLite, BGE, vector search
-citevault-ui/           # React 19 + TypeScript + Vite + Tailwind (served via nginx)
+citevault-ui/        # React 19 + TypeScript + Vite + Tailwind (served via nginx)
+finetune/            # LoRA voice fine-tune pipeline (independent uv project)
 golden/              # Golden eval cases
 docker-compose.yml   # Three-service stack: citevault-api, citevault-ui, ollama
 docs/
-  inception.md                # Project background and scope
-  architecture.md             # System diagram
+  inception.md                             # Project background and scope
+  architecture.md                          # System diagram
   evidence-format.md          # How to structure evidence files
-  smoke/smoke-test.md         # Step-by-step API + UI walkthrough
+  voice-finetune-guide.md                  # When and how to fine-tune
+  smoke/smoke-test.md                      # API + UI walkthrough
+  smoke/voice-finetune-smoke-test.md       # Fine-tune pipeline walkthrough
 ```
 
 ## Local development
@@ -101,7 +124,7 @@ npx playwright test
 | **Engine + CLI** | Complete |
 | **Eval Framework** | Golden eval set (5 cases) — run `uv run citevault eval --golden golden` to measure |
 | **React UI** | SSE streaming, Naive Comparison Mode, Playwright tests |
-| **Voice Fine-tune** | In development — LoRA on Gemma 4B to match user writing voice |
+| **Voice Fine-tune** | LoRA pipeline — dataset builder, trainer, GGUF exporter, two-axis eval |
 
 ## Maintenance
 

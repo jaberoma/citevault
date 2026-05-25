@@ -1,0 +1,32 @@
+[project]
+name = "citevault-finetune"
+version = "0.1.0"
+description = "LoRA fine-tune pipeline for Gemma 4 → personalized writing voice"
+requires-python = ">=3.11"
+dependencies = [
+  "torch>=2.4",
+  "transformers>=4.44",
+  "peft>=0.12",
+  "accelerate>=0.33",
+  "datasets>=2.21",
+  "httpx>=0.27",
+  "pyyaml>=6.0",
+  "structlog>=24.4",
+]
+
+[project.optional-dependencies]
+quant = ["bitsandbytes>=0.43"]
+dev = ["pytest>=8.3", "ruff>=0.6", "mypy>=1.11"]
+
+[project.scripts]
+citevault_finetune = "citevault_finetune.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/citevault_finetune"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
