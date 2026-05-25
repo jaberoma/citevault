@@ -139,7 +139,7 @@ UI: renders DiffViewer with grounded (left) vs naive AI (right)
 async def lifespan(app: FastAPI):
     if not hasattr(app.state, "container"):   # guard lets tests pre-set mock
         app.state.container = Container(ContainerConfig(
-            db_path=..., ollama_base_url=..., ollama_model=...,
+            db_path=..., ollama_base_url=..., ollama_model=..., ollama_timeout_s=...,
         ))                                     # loads BGE models ONCE
     yield
 
@@ -150,6 +150,8 @@ container = request.app.state.container
 ---
 
 ## Eval framework (CLI)
+
+Runs all golden cases through the full pipeline via `GoldenCaseRunner` (`application/run_evals.py`):
 
 ```bash
 cd citevault-api

@@ -1,5 +1,6 @@
 """FastAPI health endpoint and app lifecycle."""
 
+import json
 from unittest.mock import MagicMock, patch
 
 from fastapi.testclient import TestClient
@@ -8,15 +9,28 @@ from citevault.adapters.inbound.http.app import create_app
 from citevault.composition.container import Container
 
 
+def _mock_ollama_tags(model: str = "gemma4:e4b"):
+    """Return a mock httpx response that simulates Ollama /api/tags."""
+    resp = MagicMock()
+    resp.raise_for_status = MagicMock()
+    resp.json.return_value = {"models": [{"name": model}]}
+    return resp
+
+
 def test_health_returns_ok() -> None:
     app = create_app()
     mock_c = MagicMock()
     mock_c.is_ready = True
     app.state.container = mock_c
-    with TestClient(app) as client:
-        r = client.get("/api/health")
+    with patch("citevault.adapters.inbound.http.app.httpx.get", return_value=_mock_ollama_tags()):
+        with TestClient(app) as client:
+            r = client.get("/api/health")
     assert r.status_code == 200
-    assert r.json() == {"status": "ok"}
+    body = r.json()
+    assert body["status"] == "ok"
+    assert body["ollama"] == "ok"
+    assert body["model"] == "available"
+    assert body["local_models"] == "ready"
 
 
 def test_health_returns_loading_when_not_ready() -> None:
@@ -24,10 +38,43 @@ def test_health_returns_loading_when_not_ready() -> None:
     mock_c = MagicMock()
     mock_c.is_ready = False
     app.state.container = mock_c
-    with TestClient(app) as client:
-        r = client.get("/api/health")
+    with patch("citevault.adapters.inbound.http.app.httpx.get", return_value=_mock_ollama_tags()):
+        with TestClient(app) as client:
+            r = client.get("/api/health")
     assert r.status_code == 200
-    assert r.json() == {"status": "loading"}
+    body = r.json()
+    assert body["status"] == "loading"
+    assert body["local_models"] == "loading"
+    assert body["ollama"] == "ok"
+
+
+def test_health_returns_error_when_ollama_unreachable() -> None:
+    app = create_app()
+    mock_c = MagicMock()
+    mock_c.is_ready = True
+    app.state.container = mock_c
+    with patch("citevault.adapters.inbound.http.app.httpx.get", side_effect=Exception("refused")):
+        with TestClient(app) as client:
+            r = client.get("/api/health")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["status"] == "error"
+    assert body["ollama"] == "unreachable"
+    assert body["model"] == "unknown"
+
+
+def test_health_returns_loading_when_model_not_found() -> None:
+    app = create_app()
+    mock_c = MagicMock()
+    mock_c.is_ready = True
+    app.state.container = mock_c
+    with patch("citevault.adapters.inbound.http.app.httpx.get", return_value=_mock_ollama_tags("other:model")):
+        with TestClient(app) as client:
+            r = client.get("/api/health")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["status"] == "loading"
+    assert body["model"] == "not_found"
 
 
 def test_lifespan_creates_container_singleton(tmp_path, monkeypatch) -> None:

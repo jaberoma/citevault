@@ -5,7 +5,9 @@ from __future__ import annotations
 import logging
 import os
 from contextlib import asynccontextmanager
+from typing import Any
 
+import httpx
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -53,11 +55,31 @@ def create_app() -> FastAPI:
     app.include_router(ollama_router)
 
     @app.get("/api/health")
-    def health(request: Request) -> dict[str, str]:
+    def health(request: Request) -> dict[str, Any]:
         container = request.app.state.container
-        if not container.is_ready:
-            return {"status": "loading"}
-        return {"status": "ok"}
+        ollama_host = os.environ.get("OLLAMA_HOST", "http://localhost:11434").rstrip("/")
+        model = os.environ.get("CITEVAULT_MODEL", "gemma4:e4b")
+
+        ollama_ok = False
+        model_available = False
+        try:
+            r = httpx.get(f"{ollama_host}/api/tags", timeout=3.0)
+            r.raise_for_status()
+            ollama_ok = True
+            names = [m["name"] for m in r.json().get("models", [])]
+            model_available = model in names
+        except Exception:
+            pass
+
+        local_ready = container.is_ready
+        all_ok = local_ready and ollama_ok and model_available
+
+        return {
+            "status": "ok" if all_ok else ("error" if not ollama_ok else "loading"),
+            "local_models": "ready" if local_ready else "loading",
+            "ollama": "ok" if ollama_ok else "unreachable",
+            "model": "available" if model_available else ("not_found" if ollama_ok else "unknown"),
+        }
 
     return app
 

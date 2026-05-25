@@ -1,6 +1,8 @@
 services:
   ollama:
     image: ollama/ollama:latest
+    environment:
+      - OLLAMA_CONTEXT_LENGTH=8192
     volumes:
       - ollama-data:/root/.ollama
     ports:
@@ -14,6 +16,7 @@ services:
       - OLLAMA_HOST=http://ollama:11434
       - CITEVAULT_MODEL=${CITEVAULT_MODEL:-gemma4:e4b}
       - CITEVAULT_DB=/data/citevault.db
+      - CITEVAULT_LLM_TIMEOUT=1800
     volumes:
       - citevault-data:/data
       - ./evidence:/evidence:ro

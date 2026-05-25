@@ -125,6 +125,52 @@ def test_tailoring_result_includes_summary() -> None:
     assert result.summary.requirements_met == 1
 
 
+def test_requirement_failure_does_not_abort_run() -> None:
+    """A single requirement failure must not kill the entire run — other claims survive."""
+    import threading
+    from typing import Any
+
+    class _FailOnRust:
+        def __init__(self, good: list[str]) -> None:
+            self._good = list(good)
+            self._lock = threading.Lock()
+
+        def complete(self, prompt: str, **kwargs: Any) -> str:
+            if "Rust" in prompt:
+                raise ValueError("Simulated drafter failure for Rust")
+            with self._lock:
+                return self._good.pop(0)
+
+    jp = JobPosting(
+        id="jp1", raw_text="...",
+        role_title="Sr Engineer",
+        requirements=[
+            Requirement(id="r1", text="K8s", kind=RequirementKind.MUST_HAVE, priority=1),
+            Requirement(id="r2", text="Rust", kind=RequirementKind.NICE_TO_HAVE, priority=2),
+        ],
+    )
+    drafter_resp = json.dumps({"claims": [
+        {"text": "Built K8s infra", "claim_type": "achievement", "citations": ["sp1"]},
+    ]})
+    verifier_resp = json.dumps({"verdict": "SUPPORTS", "confidence": 0.9, "explanation": "ok"})
+
+    use_case = TailorResume(
+        retrieval=_RetrievalByQuery({
+            "K8s": [RetrievalCandidate(span_id="sp1", text="Built K8s", score=0.9)],
+            "Rust": [RetrievalCandidate(span_id="sp2", text="Some Rust", score=0.5)],
+        }),
+        reranker=FakeReranker(),
+        llm=_FailOnRust(good=[drafter_resp, verifier_resp]),
+        span_lookup=StubSpanLookup(),
+    )
+
+    result = use_case.run(jp, tailoring_id="t-partial")
+
+    assert result.verified_claims, "K8s requirement should still produce a verified claim"
+    assert result.summary.requirements_total == 2
+    assert result.summary.requirements_met == 1
+
+
 class _RetrievalByQuery:
     def __init__(self, mapping: dict[str, list[RetrievalCandidate]]) -> None:
         self._m = mapping

@@ -27,10 +27,10 @@ curl -s http://localhost:8000/api/health
 
 **Expected health response:**
 ```json
-{"status": "ok"}
+{"status": "ok", "local_models": "ready", "ollama": "ok", "model": "available"}
 ```
 
-If the container is still warming up (BGE models loading) you may receive `{"status": "loading"}` — wait a few seconds and retry.
+If the container is still warming up (BGE models loading) you may receive `{"status": "loading", "local_models": "loading", ...}` — wait a few seconds and retry. If Ollama is unreachable the status will be `"error"`.
 
 ---
 
@@ -248,7 +248,7 @@ npx newman run docs/smoke/citevault.postman_collection.json \
 
 | # | Request | Assertions |
 |---|---------|-----------|
-| 01 | Health Check | `status: "ok"` |
+| 01 | Health Check | `status: "ok"`, `ollama: "ok"`, `model: "available"` |
 | 02 | Upload Evidence | returns `id` + `kind` |
 | 03 | List Evidence | uploaded source present |
 | 04 | Get Settings | `model` field present |
@@ -276,7 +276,7 @@ npx playwright test --reporter=line
 ✓ Admin page loads and shows Evidence Library heading
 ✓ Settings page loads and shows model field
 ✓ New Tailoring page loads with job posting textarea
-✓ History page loads and shows Tailoring History heading
+✓ History page loads
 ```
 
 Requires the docker compose stack from step 1 to still be running.

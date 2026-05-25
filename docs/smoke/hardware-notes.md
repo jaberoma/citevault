@@ -34,22 +34,15 @@ Measured on the development machine. Read before running any smoke test.
 
 These are the levers available without hardware changes:
 
-### 1. Set Ollama thread count (most impactful)
+### 1. Context window
 
-By default Ollama may not use all cores. Force all 8 threads:
+The docker-compose stack sets `OLLAMA_CONTEXT_LENGTH=8192` on the ollama service. This pre-allocates the KV cache at model load time so every request has enough headroom for the full prompt. The default Ollama value of 4096 is too small for the naive comparison pass (all evidence + job posting).
 
-```bash
-# In docker-compose.yml, under the ollama service:
-environment:
-  - OLLAMA_NUM_THREADS=8
+### 2. Thread count
 
-# Or for a local Ollama process:
-OLLAMA_NUM_THREADS=8 ollama serve
-```
+Ollama defaults to the number of physical cores. On a 4-core/8-thread CPU this is already optimal — setting threads to 8 (logical) degrades throughput due to cache contention. No override is needed.
 
-This alone can improve throughput by 20–40%.
-
-### 2. Reduce context window
+### 3. Reduce prompt length
 
 The engine already uses targeted prompts. If you customize prompts, keep them short.
 

@@ -150,13 +150,20 @@ class TailorResume:
         if on_event:
             on_event("posting_parsed", {"requirements_count": len(posting.requirements)})
 
+        _empty_counts: dict[str, int] = {"drafts": 0, "first_pass": 0, "rewritten": 0, "rejected": 0}
         total_reqs = len(posting.requirements)
         with ThreadPoolExecutor(max_workers=3) as executor:
             futures = [
                 executor.submit(self._process_requirement, req, i, total_reqs, on_event)
                 for i, req in enumerate(posting.requirements)
             ]
-            results = [f.result() for f in futures]
+            results = []
+            for f in futures:
+                try:
+                    results.append(f.result())
+                except Exception as exc:
+                    logger.warning("Requirement processing failed, skipping: %s", exc)
+                    results.append(([], None, {}, _empty_counts))
 
         verified: list[Claim] = []
         met: set[str] = set()
