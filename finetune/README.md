@@ -22,12 +22,39 @@ Aim for 100–300 samples, 50k–100k total tokens.
 - ~10 GB free disk space; ~16 GB VRAM (or unified memory on Apple Silicon)
   recommended for the training step
 
+If you don't have `llama.cpp` available, use `--skip-export` to run the
+dataset-building and training steps only (GGUF export is skipped):
+
+```bash
+uv run python -m citevault_finetune --voice ./voice-samples/ --out ./out --skip-export
+```
+
 ## Run
 
 ```bash
 cd finetune
 uv sync --extra dev
 uv run python -m citevault_finetune --voice ./voice-samples/ --out ./out
+```
+
+## Tests
+
+Unit tests (no dependencies required):
+
+```bash
+.venv/bin/pytest
+```
+
+Integration tests against a live Ollama instance (dataset builder + voice evaluator):
+
+```bash
+CITEVAULT_FINETUNE_INTEGRATION=1 .venv/bin/pytest tests/test_integration.py -v
+```
+
+Trainer smoke test (downloads ~10 MB of tiny-gpt2, CPU-only):
+
+```bash
+CITEVAULT_FINETUNE_SMOKE=1 .venv/bin/pytest tests/test_trainer_smoke.py -v
 ```
 
 ## Register the model with Ollama

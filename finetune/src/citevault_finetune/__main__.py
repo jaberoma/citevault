@@ -25,6 +25,11 @@ def main() -> None:
         action="store_true",
         help="Skip training (assume adapter already in --out/adapter).",
     )
+    p.add_argument(
+        "--skip-export",
+        action="store_true",
+        help="Skip GGUF export (useful when llama.cpp is not available).",
+    )
     args = p.parse_args()
 
     out_dir = Path(args.out)
@@ -57,16 +62,19 @@ def main() -> None:
     else:
         print("[1-2/3] Skipped training; using existing adapter.")
 
-    print("[3/3] Exporting to GGUF + Modelfile…")
-    export_lora_to_gguf(adapter_dir=str(adapter_dir), out_gguf=str(gguf_path))
-    write_ollama_modelfile(
-        out_path=str(modelfile),
-        base_tag=args.base_ollama_tag,
-        adapter_gguf=str(gguf_path.name),
-    )
-    print("\nDone! Next step:")
-    print(f"  cd {out_dir} && ollama create citevault-voice -f ./Modelfile")
-    print("Then open Citevault Settings → Model and pick 'citevault-voice'.")
+    if not args.skip_export:
+        print("[3/3] Exporting to GGUF + Modelfile…")
+        export_lora_to_gguf(adapter_dir=str(adapter_dir), out_gguf=str(gguf_path))
+        write_ollama_modelfile(
+            out_path=str(modelfile),
+            base_tag=args.base_ollama_tag,
+            adapter_gguf=str(gguf_path.name),
+        )
+        print("\nDone! Next step:")
+        print(f"  cd {out_dir} && ollama create citevault-voice -f ./Modelfile")
+        print("Then open Citevault Settings → Model and pick 'citevault-voice'.")
+    else:
+        print("[3/3] Skipped GGUF export (--skip-export).")
 
 
 if __name__ == "__main__":
